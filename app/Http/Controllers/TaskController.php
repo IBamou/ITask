@@ -21,6 +21,7 @@ class TaskController extends Controller
      */
     public function store(Request $request, Category $category)
     {
+        $this->authorize('create', [Task::class, $category]);
         $validation = $request->validate([
             'title' => 'required|string',
             'description' => 'nullable',
@@ -41,6 +42,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, Category $category, Task $task)
     {
+        $this->authorize('update', $task);
         $validation = $request->validate([
             'title' => 'required',
             'description' => 'nullable',
@@ -59,6 +61,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task, Category $category)
     {
+        $this->authorize('delete', $task);
         $task->delete();
         return redirect()->route('categories.show', $category->id);
     }
