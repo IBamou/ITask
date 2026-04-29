@@ -29,6 +29,7 @@ class SubtaskController extends Controller
      */
     public function store(Request $request, Task $task)
     {
+        $this->authorize('create', Subtask::class);
         $validation = $request->validate([
             'task' => 'required'
         ]);
@@ -58,6 +59,7 @@ class SubtaskController extends Controller
      */
     public function update(Request $request, Subtask $subtask)
     {
+        $this->authorize('update', $subtask);
         $validation = $request->validate([
             'task' => 'required',
         ]);
@@ -72,6 +74,7 @@ class SubtaskController extends Controller
      */
     public function destroy(Subtask $subtask)
     {
+        $this->authorize('delete', $subtask);
         $categoryId = $subtask->task->category->id;
         $subtask->delete();
         return redirect()->route('categories.show', $categoryId);

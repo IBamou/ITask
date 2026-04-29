@@ -12,6 +12,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Category::class);
         $categories = auth()->user()->categories;
 
         return view('categories.index', compact('categories'));
@@ -22,6 +23,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Category::class);
         $validation = $request->validate([
             'name' => 'required',
         ]);
@@ -35,6 +37,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
+        $this->authorize('view', $category);
         $tasks = $category->tasks;
 
         return view('categories.show', compact('category', 'tasks'));
@@ -45,6 +48,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
+        $this->authorize('update', $category);
         $validation = $request->validate([
             'name' => 'required',
         ]);
@@ -58,6 +62,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        $this->authorize('delete', $category);
         $category->delete();
 
         return redirect()->route('categories.index');
