@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubtaskController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/{category}/task-store', 'store')->name('categories.task.store');
         Route::put('/{category}/{task}/update', 'update')->name('categories.task.update');
         Route::delete('/{category}/{task}/delete', 'destroy')->name('categories.task.delete');
+    });
+
+    Route::controller(SubtaskController::class)->prefix('tasks')->group(function () {
+        Route::post('/{task}/subtask-store', 'store')->name('tasks.subtask.store');
+        Route::put('/{task}/subtask/{subtask}/update', 'update')->name('tasks.subtask.update');
+        Route::delete('/{task}/subtask/{subtask}/delete', 'destroy')->name('tasks.subtask.delete');
     });
 });
 
