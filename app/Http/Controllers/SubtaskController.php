@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subtask;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class SubtaskController extends Controller
@@ -26,9 +27,14 @@ class SubtaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Task $task)
     {
-        //
+        $validation = $request->validate([
+            'task' => 'required'
+        ]);
+
+        $task->subtasks()->create($validation);
+        return redirect()->route('categories.show', $task->category->id);
     }
 
     /**
@@ -52,7 +58,13 @@ class SubtaskController extends Controller
      */
     public function update(Request $request, Subtask $subtask)
     {
-        //
+        $validation = $request->validate([
+            'task' => 'required',
+        ]);
+
+        $subtask->update($validation);
+
+        return redirect()->route('categories.show', $subtask->task->category->id);
     }
 
     /**
@@ -60,6 +72,8 @@ class SubtaskController extends Controller
      */
     public function destroy(Subtask $subtask)
     {
-        //
+        $categoryId = $subtask->task->category->id;
+        $subtask->delete();
+        return redirect()->route('categories.show', $categoryId);
     }
 }
