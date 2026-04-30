@@ -20,11 +20,11 @@ class Task extends Model
 
     public function category()
     {
-        $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function subtasks()
     {
-        $this->hasMany(Subtask::class);
+        return $this->hasMany(Subtask::class);
     }
 }

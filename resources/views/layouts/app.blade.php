@@ -14,9 +14,30 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased" x-data="{ showToast: false, toastMessage: '', toastType: 'success' }">
+        @if(session('success'))
+            <div x-data="{ showToast: true, toastMessage: '{{ session('success') }}', toastType: 'success' }"
+                 x-init="setTimeout(() => showToast = false, 3000)">
+            </div>
+        @endif
+
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
+
+            @if(session('success'))
+                <div x-data="{ show: true }"
+                     x-init="setTimeout(() => show = false, 3000)"
+                     x-show="show"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="translate-x-full opacity-0"
+                     x-transition:enter-end="translate-x-0 opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="translate-x-0 opacity-100"
+                     x-transition:leave-end="translate-x-full opacity-0"
+                     class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg bg-green-500 text-white font-medium">
+                    {{ session('success') }}
+                </div>
+            @endif
 
             <!-- Page Heading -->
             @isset($header)

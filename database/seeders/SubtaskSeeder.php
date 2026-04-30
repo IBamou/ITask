@@ -13,6 +13,6 @@ class SubtaskSeeder extends Seeder
      */
     public function run(): void
     {
-        Subtask::factory()->count(30)->create();
+        Subtask::factory()->count(500)->create();
     }
 }

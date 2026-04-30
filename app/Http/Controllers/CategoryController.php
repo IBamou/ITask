@@ -29,7 +29,7 @@ class CategoryController extends Controller
         ]);
         auth()->user()->categories()->create($validation);
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }
 
     /**
@@ -38,7 +38,7 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         $this->authorize('view', $category);
-        $tasks = $category->tasks;
+        $tasks = $category->tasks()->with('subtasks')->orderByRaw("CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END")->get();
 
         return view('categories.show', compact('category', 'tasks'));
     }
@@ -54,7 +54,7 @@ class CategoryController extends Controller
         ]);
         $category->update($validation);
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
     }
 
     /**
@@ -65,6 +65,6 @@ class CategoryController extends Controller
         $this->authorize('delete', $category);
         $category->delete();
 
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
     }
 }
