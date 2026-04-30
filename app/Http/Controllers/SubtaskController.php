@@ -29,13 +29,23 @@ class SubtaskController extends Controller
      */
     public function store(Request $request, Task $task)
     {
-        $this->authorize('create', Subtask::class);
+        // Check if user owns the task's category
+        if ($task->category->user_id !== auth()->id()) {
+            abort(403, 'You do not own this task');
+        }
+        
         $validation = $request->validate([
             'task' => 'required'
         ]);
 
-        $task->subtasks()->create($validation);
-        return redirect()->route('categories.show', $task->category->id);
+        \Log::info('Creating subtask', [
+            'task_id' => $task->id,
+            'subtask_data' => $validation
+        ]);
+
+        $subtask = $task->subtasks()->create($validation);
+
+        return response()->json(['message' => 'Subtask created successfully.', 'subtask' => $subtask]);
     }
 
     /**
@@ -57,8 +67,9 @@ class SubtaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Subtask $subtask)
+    public function update(Request $request, Task $task, string $subtask)
     {
+        $subtask = Subtask::findOrFail($subtask);
         $this->authorize('update', $subtask);
         $validation = $request->validate([
             'task' => 'required',
@@ -66,17 +77,34 @@ class SubtaskController extends Controller
 
         $subtask->update($validation);
 
-        return redirect()->route('categories.show', $subtask->task->category->id);
+        return redirect()->route('categories.show', $subtask->task()->first()->category->id)->with('success', 'Subtask updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Subtask $subtask)
+    public function destroy(Task $task, string $subtask)
     {
+        $subtask = Subtask::findOrFail($subtask);
         $this->authorize('delete', $subtask);
-        $categoryId = $subtask->task->category->id;
+        $categoryId = $subtask->task()->first()->category->id;
         $subtask->delete();
-        return redirect()->route('categories.show', $categoryId);
+        return redirect()->route('categories.show', $categoryId)->with('success', 'Subtask deleted successfully.');
+    }
+
+    /**
+     * Toggle subtask done status.
+     */
+    public function toggle(Request $request, string $subtask)
+    {
+        $subtask = Subtask::findOrFail($subtask);
+        
+        if ($subtask->task->category->user_id !== auth()->id()) {
+            abort(403, 'You do not own this task');
+        }
+
+        $subtask->update(['done' => $request->done]);
+        
+        return response()->json(['success' => true, 'done' => $subtask->done]);
     }
 }

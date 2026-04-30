@@ -12,11 +12,6 @@ class SubtaskPolicy
         return true;
     }
 
-    public function view(User $user, Subtask $subtask): bool
-    {
-        return $user->id === $subtask->task->category->user_id;
-    }
-
     public function create(User $user): bool
     {
         return true;

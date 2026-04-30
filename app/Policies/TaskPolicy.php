@@ -17,9 +17,9 @@ class TaskPolicy
         return $user->id === $task->category->user_id;
     }
 
-    public function create(User $user, Task $task): bool
+    public function create(User $user): bool
     {
-        return $user->id === $task->category->user_id;
+        return true;
     }
 
     public function update(User $user, Task $task): bool

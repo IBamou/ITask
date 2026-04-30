@@ -21,20 +21,24 @@ class TaskController extends Controller
      */
     public function store(Request $request, Category $category)
     {
-        $this->authorize('create', [Task::class, $category]);
+        // Check if user owns the category
+        if ($category->user_id !== auth()->id()) {
+            abort(403, 'You do not own this category');
+        }
+
         $validation = $request->validate([
             'title' => 'required|string',
             'description' => 'nullable',
-            'priority' => 'required|in:low, medium, high',
+            'priority' => 'required|in:low,medium,high',
             'due_date' => 'nullable',
         ]);
 
-        $category->tasks()->create([
+        $task = $category->tasks()->create([
             ...$validation,
             'user_id' => auth()->id(),
         ]);
-
-        return redirect()->route('categories.show', $category->id);
+        //  dd($task);
+        return redirect()->route('categories.show', $category->id)->with('success', 'Task created successfully.');
     }
 
     /**
@@ -43,17 +47,34 @@ class TaskController extends Controller
     public function update(Request $request, Category $category, Task $task)
     {
         $this->authorize('update', $task);
-        $validation = $request->validate([
+
+        $request->validate([
             'title' => 'required',
             'description' => 'nullable',
-            'status' => 'required|in:pending, in_progress, done',
-            'priority' => 'required|in:low, medium, high',
+            'status' => 'required|in:pending,in_progress,done',
+            'priority' => 'required|in:low,medium,high',
             'due_date' => 'nullable',
         ]);
 
-        $task->update($validation);
+        $task->update($request->only(['title', 'description', 'status', 'priority', 'due_date']));
 
-        return redirect()->route('categories.show', $category->id);
+        return redirect()->route('categories.show', $category->id)->with('success', 'Task updated successfully.');
+    }
+
+    /**
+     * Toggle task status (partial update).
+     */
+    public function toggleStatus(Request $request, Category $category, Task $task)
+    {
+        $this->authorize('update', $task);
+
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,done',
+        ]);
+
+        $task->update(['status' => $request->status]);
+
+        return response()->json(['success' => true, 'status' => $request->status]);
     }
 
     /**
@@ -63,6 +84,6 @@ class TaskController extends Controller
     {
         $this->authorize('delete', $task);
         $task->delete();
-        return redirect()->route('categories.show', $category->id);
+        return redirect()->route('categories.show', $category->id)->with('success', 'Task deleted successfully.');
     }
 }

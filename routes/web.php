@@ -27,14 +27,16 @@ Route::middleware('auth')->group(function () {
 
     Route::controller(TaskController::class)->prefix('categories')->group(function () {
         Route::post('/{category}/task-store', 'store')->name('categories.task.store');
+        Route::post('/{category}/{task}/toggle', 'toggleStatus')->name('categories.task.toggle');
         Route::put('/{category}/{task}/update', 'update')->name('categories.task.update');
         Route::delete('/{category}/{task}/delete', 'destroy')->name('categories.task.delete');
     });
 
     Route::controller(SubtaskController::class)->prefix('tasks')->group(function () {
         Route::post('/{task}/subtask-store', 'store')->name('tasks.subtask.store');
-        Route::put('/{task}/subtask/{subtask}/update', 'update')->name('tasks.subtask.update');
-        Route::delete('/{task}/subtask/{subtask}/delete', 'destroy')->name('tasks.subtask.delete');
+        Route::put('/subtask/{subtask}/update', 'update')->name('tasks.subtask.update');
+        Route::put('/subtask/{subtask}/toggle', 'toggle')->name('tasks.subtask.toggle');
+        Route::delete('/subtask/{subtask}/delete', 'destroy')->name('tasks.subtask.delete');
     });
 });
 
