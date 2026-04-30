@@ -1,1 +1,1 @@
-<span {{ $attributes->class('text-xl font-bold text-indigo-600 dark:text-indigo-400') }}>ITask</span>
+<span {{ $attributes->class('text-xl font-bold text-indigo-600 dark:text-indigo-400') }}>{{ config('app.name') }}</span>

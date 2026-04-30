@@ -231,8 +231,9 @@
                         body: JSON.stringify({
                             status: newStatus
                         })
-                    }).then(() => {
+                    }).then(response => response.json()).then(data => {
                         taskCard.classList.remove('opacity-50');
+                        showToast('Task updated successfully');
                         window.location.reload();
                     }).catch(() => {
                         taskCard.classList.remove('opacity-50');
